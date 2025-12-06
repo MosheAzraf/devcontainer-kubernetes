@@ -94,6 +94,7 @@ echo "✔ Installation complete"
 VS Code → Command Palette → **Rebuild and Reopen in Container**
 
 ## Add kubeconfig
+> This is specific for k3s, use whatever your kubernetes provider requires.
 
 Copy from control-plane:
 
