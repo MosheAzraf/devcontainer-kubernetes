@@ -27,7 +27,7 @@ git clone https://github.com/MosheAzraf/Dev-Container-For-Kubernetes
 
 ```json
 {
-  "name": "K3s Dev",
+  "name": "K3s Dev", //you can change it to any name you want.
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "postCreateCommand": "bash .devcontainer/postCreateCommand.sh"
 }
