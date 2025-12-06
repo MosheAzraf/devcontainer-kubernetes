@@ -1,82 +1,122 @@
-# Dev Container for Kubernetes
+# Dev Container for Kubernetes (K3s)
 
-A concise guide for configuring a **Dev Container** with `kubectl` to manage a local or remote **Kubernetes / K3s cluster** directly from VS Code.
-
-> **Note:** This setup was created and tested on an **ARM-based architecture** (e.g., Apple Silicon / Raspberry Pi).
+A ready-to-use VS Code Dev Container for working with `kubectl` against a local or remote Kubernetes / K3s cluster.
 
 ---
 
-### 1. Prepare the setup
-1. Create a new project folder and open it in **VS Code**.  
-2. Inside that folder, create a directory named `.devcontainer`.  
-3. Within `.devcontainer`, create a file called `devcontainer.json`.
+## Clone
+```bash
+git clone https://github.com/MosheAzraf/Dev-Container-For-Kubernetes
+```
 
----
 
-### 2. Add the configuration
-Copy the following content into your `devcontainer.json` file:
+
+## Project structure
+
+```
+.
+├─ .devcontainer/
+│  ├─ devcontainer.json
+│  └─ postCreateCommand.sh
+└─ README.md
+```
+
+## Dev Container configuration
+
+**.devcontainer/devcontainer.json**
 
 ```json
 {
   "name": "K3s Dev",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "postCreateCommand": "curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl && curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl.sha256 && sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && mkdir -p ~/.kube && touch ~/.kube/config && chmod 600 ~/.kube/config"
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
 }
 ```
 
----
-
-### 3. Launch the Dev Container
-Before running, make sure you have the **Dev Containers** extension from Microsoft installed.  
-
-Click the blue `><` icon in the bottom-left corner of VS Code,  
-then select **“Reopen in Dev Container”**.  
-
-This will build and open your project inside a ready-to-use container environment.
-
-![Opening Dev Container Demo](./helpers/demo.gif)
-
----
-
-### 4. Retrieve your cluster configuration
-On your control-plane node, run the following command to display your cluster configuration:
-
-``` sudo cat /etc/rancher/k3s/k3s.yaml ```
-
-The output should look like this:
-![Example kubeconfig file](./helpers/cluster-info-example.png)
->parts of my cluster are covered for security purposes. you should not share it with other people.
-
-
-Copy the entire output and save it temporarily to a text file.
-
----
-
-### 5. Edit the kubeconfig inside the container
-Inside the Dev Container, open the config file:
+Make executable once (run before creating the container):
 ```bash
-nano ~/.kube/config
+chmod +x .devcontainer/postCreateCommand.sh
 ```
 
-Paste the content you copied earlier into this file.  
+## Post-create script
 
-Locate the line that looks like this:
-```
-server: https://127.0.0.1:6443
-```
+**.devcontainer/postCreateCommand.sh**
 
-Replace the IP address with the **actual IP of your control-plane node**.  
-You can find it using:
 ```bash
-ifconfig
+#!/usr/bin/env bash
+set -e
+
+# Detect architecture
+ARCH=$(uname -m)
+if [ "$ARCH" = "x86_64" ]; then
+    KUBE_ARCH="amd64"
+elif [ "$ARCH" = "aarch64" ]; then
+    KUBE_ARCH="arm64"
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi
+
+echo "✔ Detected architecture: $ARCH → kubectl: linux/$KUBE_ARCH"
+
+# Get version
+KUBE_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+BASE_URL="https://dl.k8s.io/release/${KUBE_VERSION}/bin/linux/${KUBE_ARCH}"
+
+# Download
+curl -LO "${BASE_URL}/kubectl"
+curl -LO "${BASE_URL}/kubectl.sha256" #download signature file for verification
+
+# Install
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# Check
+if [ -f kubectl ] && [ -f kubectl.sha256 ]; then
+    echo "✔ kubectl files created"
+    rm kubectl.sha256
+else
+    echo "✘ missing files, aborting"
+    exit 1
+fi
+
+# Config folder
+mkdir -p ~/.kube
+touch ~/.kube/config
+chmod 600 ~/.kube/config
+
+echo "✔ Installation complete"
 ```
 
 ---
 
-### 6. Verify the setup
-Run the following command to confirm that `kubectl` is connected to your cluster:
+## Launch
+
+VS Code → Command Palette → **Rebuild and Reopen in Container**
+
+## Add kubeconfig
+
+Copy from control-plane:
+
+```bash
+sudo cat /etc/rancher/k3s/k3s.yaml
+```
+
+Paste into:
+
+```bash
+~/.kube/config
+```
+
+Update host:
+
+```
+server: https://YOUR-CLUSTER-IP:6443
+```
+
+## Verify
+
 ```bash
 kubectl get nodes
 ```
 
-If you see your cluster nodes listed — everything is configured correctly.
+If nodes are listed — done.
