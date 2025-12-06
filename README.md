@@ -1,6 +1,6 @@
-# Dev Container for Kubernetes (K3s)
+# Dev Container for Kubernetes
 
-A ready-to-use VS Code Dev Container for working with `kubectl` against a local or remote Kubernetes / K3s cluster.
+A ready-to-use VS Code Dev Container for working with `kubectl` against a local or remote Kubernetes cluster.
 
 ---
 
