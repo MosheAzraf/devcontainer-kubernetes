@@ -29,7 +29,7 @@ git clone https://github.com/MosheAzraf/Dev-Container-For-Kubernetes
 {
   "name": "K3s Dev",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh"
 }
 ```
 
@@ -73,7 +73,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 # Check
 if [ -f kubectl ] && [ -f kubectl.sha256 ]; then
     echo "✔ kubectl files created"
-    rm kubectl.sha256
+    rm kubectl kubectl.sha256 
 else
     echo "✘ missing files, aborting"
     exit 1
