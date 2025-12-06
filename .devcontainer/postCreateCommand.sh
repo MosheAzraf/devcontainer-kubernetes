@@ -28,7 +28,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 # Check
 if [ -f kubectl ] && [ -f kubectl.sha256 ]; then
     echo "✔ kubectl files created"
-    rm kubectl.sha256
+    rm kubectl kubectl.sha256 
 else
     echo "✘ missing files, aborting"
     exit 1
