@@ -121,4 +121,3 @@ kubectl get nodes
 ```
 
 If nodes are listed — done.
-# ArgoCD-Playground
