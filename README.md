@@ -6,7 +6,7 @@ A ready-to-use VS Code Dev Container for working with `kubectl` against a local 
 
 ## Clone
 ```bash
-git clone https://github.com/MosheAzraf/Dev-Container-For-Kubernetes
+git clone https://github.com/MosheAzraf/devcontainer-kubernetes
 ```
 
 
